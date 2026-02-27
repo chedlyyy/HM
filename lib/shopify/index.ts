@@ -5,11 +5,7 @@ import {
 } from "lib/constants";
 import { isShopifyError } from "lib/type-guards";
 import { ensureStartsWith } from "lib/utils";
-import {
-  unstable_cacheLife as cacheLife,
-  unstable_cacheTag as cacheTag,
-  revalidateTag,
-} from "next/cache";
+import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -58,8 +54,11 @@ import {
   ShopifyUpdateCartOperation,
 } from "./types";
 
-const domain = process.env.SHOPIFY_STORE_DOMAIN
-  ? ensureStartsWith(process.env.SHOPIFY_STORE_DOMAIN, "https://")
+const rawDomain = process.env.SHOPIFY_STORE_DOMAIN ?? "";
+const isPlaceholder =
+  !rawDomain || rawDomain.includes("[") || rawDomain.includes("]");
+const domain = !isPlaceholder
+  ? ensureStartsWith(rawDomain, "https://")
   : "";
 const endpoint = domain ? `${domain}${SHOPIFY_GRAPHQL_API_ENDPOINT}` : "";
 const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
@@ -297,6 +296,10 @@ export async function getCollection(
   "use cache";
   cacheTag(TAGS.collections);
   cacheLife("days");
+
+  if (!endpoint) {
+    return undefined;
+  }
 
   const res = await shopifyFetch<ShopifyCollectionOperation>({
     query: getCollectionQuery,

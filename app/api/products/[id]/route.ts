@@ -35,8 +35,8 @@ export async function GET(_: NextRequest, props: Params) {
     category: product.category
       ? {
           id: product.category._id.toString(),
-          name: product.category.name,
-          slug: product.category.slug,
+          name: (product.category as any).name,
+          slug: (product.category as any).slug,
         }
       : null,
     createdAt: product.createdAt,

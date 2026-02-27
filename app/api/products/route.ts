@@ -5,6 +5,14 @@ import { connectToDatabase } from "lib/db/connect";
 import { Product } from "lib/db/models/Product";
 import { Category } from "lib/db/models/Category";
 
+
+interface CategoryDocument {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+
 function ensureAdmin(session: any) {
   if (!session?.user || (session.user as any).role !== "admin") {
     return false;
@@ -27,8 +35,8 @@ export async function GET() {
       category: p.category
         ? {
             id: p.category._id.toString(),
-            name: p.category.name,
-            slug: p.category.slug,
+            name: (p.category as any).name,
+            slug: (p.category as any).slug,
           }
         : null,
       createdAt: p.createdAt,

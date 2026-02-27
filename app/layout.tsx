@@ -4,10 +4,9 @@ import { AuthProvider } from "components/auth/AuthProvider";
 import { CartProvider } from "components/cart/CartContext";
 import { CartDrawer } from "components/cart/CartDrawer";
 import { CartIcon } from "components/cart/CartIcon";
-import { GeistSans } from "geist/font/sans";
 import Image from "next/image";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import "./globals.css";
 import { baseUrl } from "lib/utils";
 
@@ -31,7 +30,7 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.variable}>
+    <html lang="en">
       <body className="bg-neutral-50 text-black selection:bg-teal-300 dark:bg-neutral-900 dark:text-white dark:selection:bg-pink-500 dark:selection:text-white">
         <AuthProvider>
           <CartProvider>
@@ -73,8 +72,17 @@ export default async function RootLayout({
                     </nav>
                   </div>
                   <div className="flex items-center gap-2 md:gap-4">
-                    <UserMenu />
-                    <CartIcon />
+                    <Suspense
+                      fallback={
+                        <div className="flex items-center gap-2 md:gap-4">
+                          <div className="h-6 w-16 animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                          <div className="h-9 w-9 animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-800" />
+                        </div>
+                      }
+                    >
+                      <UserMenu />
+                      <CartIcon />
+                    </Suspense>
                   </div>
                 </div>
               </header>
